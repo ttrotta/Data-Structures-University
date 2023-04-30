@@ -55,9 +55,11 @@ public class ListaSE<E> implements PositionList<E>{
 	public Position<E> prev(Position<E> p) throws InvalidPositionException, BoundaryViolationException {
 		checkPosition(p);
 		try {
-			if(p == first()) // Podría hacer el try-catch de EmptyListException.
+			if(p == first()) 
 				throw new BoundaryViolationException("La posición recibida es la primera.");
-		} catch(EmptyListException e) { e.printStackTrace(); }
+		} catch(EmptyListException e) {
+			e.printStackTrace();
+		}
 		Nodo<E> aux = head;
 		while(aux.getNext() != p && aux.getNext() != null) {
 			aux = aux.getNext();
@@ -74,15 +76,15 @@ public class ListaSE<E> implements PositionList<E>{
 	
 	public void addLast(E element) {
 		if(isEmpty())
-			addFirst(element);
+			addFirst(element); 
 		else {
 			Nodo<E> p = head;
 			while(p.getNext() != null) {
 				p = p.getNext();
 			}
 			p.setNext(new Nodo<E>(element));
+			size++; // addFirst ya aumenta el tamaño.
 		}
-		size++;
 	}
 	
 	public void addAfter(Position<E> p, E element) throws InvalidPositionException {
@@ -132,22 +134,35 @@ public class ListaSE<E> implements PositionList<E>{
 		return removed;
 	}
 	
-	/* 
+	@Override
 	public Iterator<E> iterator() {
 		return new ElementIterator<E>(this);
 	}
-	
-	public Iterable<Position<E>> positions() {
-		PositionList<Position<E>> toReturn = new ListaSimplementeEnlazada<Position<E>>();
+
+	@Override
+	public Iterable<Position<E>> positions() { // Devuelve un iterable de posiciones
+		PositionList<Position<E>> toReturn = new ListaSE<Position<E>>();
 		Nodo<E> actual = head;
-		while (actual != null) {
+		while(actual != null) {
 			toReturn.addLast(actual);
 			actual = actual.getNext();
 		}
+		
 		return toReturn;
-	} 
+	}
 	
-	*/
+	public String toString() {
+		Iterator<E> it = iterator(); // Le pido el iterador a la lista this.
+		String s = "[";
+		while(it.hasNext()) {
+			s += it.next();          // Hay un cast implícito de E a String, equivale a: s+=it.next().toString();
+			if(it.hasNext())         // Hago append de una coma si quedan elementos.
+				s += ", ";
+		}
+		s += "]";
+		return s;
+	}
+
 	private Nodo<E> checkPosition(Position<E> p) throws InvalidPositionException {
 		try {
 			if(p == null)
@@ -169,6 +184,7 @@ public class ListaSE<E> implements PositionList<E>{
 	 * que hace.
 	 * @param <E> generico.
 	 */
+	
 	@SuppressWarnings("hiding")
 	private class Nodo<E> implements Position<E> { // Lo unico distinto a la otra es que implementa Position y en vez de getElement() es element()
 		private E element;
@@ -198,18 +214,5 @@ public class ListaSE<E> implements PositionList<E>{
 		public void setNext(Nodo<E> next) {
 			this.next = next;
 		}
-	}
-
-
-	@Override
-	public Iterator<E> iterator() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Iterable<Position<E>> positions() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

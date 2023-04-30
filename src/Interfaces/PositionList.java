@@ -8,8 +8,7 @@ import Exceptions.*;
  * @author C�tedra de Estructuras de Datos, Departamento de Cs. e Ing. de la Computaci�n, UNS.
  */
 
-public interface PositionList<E> extends Iterable<E>
-{
+public interface PositionList<E> extends Iterable<E> {
 	/**
 	 * Consulta la cantidad de elementos de la lista.
 	 * @return Cantidad de elementos de la lista.
