@@ -14,8 +14,13 @@ public class ListaDE<E> implements PositionList<E> {
 		
 		public Nodo(E e, Nodo<E> p, Nodo<E> n) {
 			element = e;
-			p = prev;
-			n = next;
+			prev = p;
+			next= n;
+		}
+		
+		@SuppressWarnings("unused")
+		public Nodo(E e) {
+			this(e,null,null);
 		}
 		
 		public E element() { return element; }
@@ -24,7 +29,8 @@ public class ListaDE<E> implements PositionList<E> {
 		
 		public Nodo<E> getNext(){ return next; }
 		
-		@SuppressWarnings("unused")
+		public void setElement(E e) { element = e; }
+		
 		public void setPrev(Nodo<E> p) { prev = p; }
 		
 		public void setNext(Nodo<E> n) { next = n; }
@@ -39,6 +45,7 @@ public class ListaDE<E> implements PositionList<E> {
 		header = new Nodo<>(null,null,null);
 		trailer = new Nodo<>(null,header,null);
 		header.setNext(trailer);
+		size = 0;
 	}
 	
 	public int size() {
@@ -76,61 +83,97 @@ public class ListaDE<E> implements PositionList<E> {
 	}
 
 	public void addFirst(E element) {
-		Nodo<E> nuevo = new Nodo<E>(null,null,null);
-		
+		Nodo<E> nuevo = new Nodo<E>(element,header,null);
+		nuevo.setNext(header.getNext());
+		header.getNext().setPrev(nuevo);
+		header.setNext(nuevo);
+		size++;
 	}
 
-	@Override
 	public void addLast(E element) {
-		// TODO Auto-generated method stub
-		
+		Nodo<E> nuevo;
+		if(isEmpty())
+			addFirst(element);
+		else {
+			nuevo = new Nodo<E>(element,null,trailer);
+			nuevo.setPrev(trailer.getPrev());
+			trailer.getPrev().setNext(nuevo);
+			trailer.setPrev(nuevo);
+			size++;
+		}
 	}
 
-	@Override
 	public void addAfter(Position<E> p, E element) throws InvalidPositionException {
-		// TODO Auto-generated method stub
-		
+		Nodo<E> pos = checkPosition(p);
+		Nodo<E> nuevo = new Nodo<E>(element,pos,null);
+		nuevo.setNext(pos.getNext());
+		nuevo.getNext().setPrev(nuevo);
+		pos.setNext(nuevo);
+		size++;
 	}
 
-	@Override
 	public void addBefore(Position<E> p, E element) throws InvalidPositionException {
-		// TODO Auto-generated method stub
-		
+		Nodo<E> pos = checkPosition(p);
+		Nodo<E> nuevo = new Nodo<E>(element,null,pos);
+		nuevo.setPrev(pos.getPrev());
+		pos.getPrev().setNext(nuevo);
+		pos.setPrev(nuevo);
+		size++;
 	}
-
+	     
 	@Override
 	public E remove(Position<E> p) throws InvalidPositionException {
-		// TODO Auto-generated method stub
-		return null;
+		Nodo<E> pos = checkPosition(p);
+        E toReturn;
+        pos.getPrev().setNext(pos.getNext());
+        pos.getNext().setPrev(pos.getPrev());
+        toReturn = pos.element();
+        pos.setElement(null);
+        pos.setPrev(null);
+        pos.setNext(null);
+        size--;
+        return toReturn;
 	}
 
-	@Override
 	public E set(Position<E> p, E element) throws InvalidPositionException {
-		// TODO Auto-generated method stub
-		return null;
+		Nodo<E> pos = checkPosition(p);
+		E toReturn = pos.element();
+		pos.setElement(element);
+		return toReturn;
 	}
 
-	@Override
 	public Iterator<E> iterator() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ElementIterator<>(this);
 	}
 
-	@Override
 	public Iterable<Position<E>> positions() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        PositionList<Position<E>> toReturn = new ListaDE<Position<E>>();
+        Nodo<E> nodo = header.getNext();
+        while(nodo != trailer) {
+            toReturn.addLast(nodo);
+            nodo = nodo.getNext();
+        }
+        return toReturn;
+    }
 	 
 	private Nodo<E> checkPosition(Position<E> p) throws InvalidPositionException {
 		try {
-			if(p == null)
-				throw new InvalidPositionException("La posición es nula.");
-			if(p.element() == null)
-				throw new InvalidPositionException("La posición fue eliminada previamente.");
-			return (Nodo<E>) p;
+			if( p == null )
+                throw new InvalidPositionException("La posición es nula.");
+            if( p == header )
+                throw new InvalidPositionException("La posición es inválida.");
+            if( p == trailer )
+                throw new InvalidPositionException("La posición es inválida.");
+            if( p.element() == null )
+                throw new InvalidPositionException("La posición fue eliminada previamente.");
+            Nodo<E> nodo = (Nodo<E>) p;
+            if ((nodo.getPrev() == null))
+                throw new InvalidPositionException("La posición no tiene anterior.");
+            else if ((nodo.getNext() == null)) 
+            	throw new InvalidPositionException("La posición no tiene siguiente.");
+            return nodo;
 		} catch(ClassCastException e) {
-			throw new InvalidPositionException("Posicion inválida, no es de tipo Nodo E.");
+			throw new InvalidPositionException("La posición no es de tipo Nodo E.");
 		}
 	}
 	

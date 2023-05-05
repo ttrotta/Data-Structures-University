@@ -21,7 +21,7 @@ public class ListTest {
 	 */
 
 	private PositionList<String> getList() {
-		return new ListaSE<String>();
+		return new ListaDE<String>();
 	}
 
 	@Before

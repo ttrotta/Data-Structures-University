@@ -171,7 +171,7 @@ public class ListaSE<E> implements PositionList<E>{
 				throw new InvalidPositionException("La posición fue eliminada previamente.");
 			return (Nodo<E>) p;
 		} catch(ClassCastException e) {
-			throw new InvalidPositionException("Posicion inválida, no es de tipo Nodo E.");
+			throw new InvalidPositionException("La posición es inválida, no es de tipo Nodo E.");
 		}
 	}
 	
