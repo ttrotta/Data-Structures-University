@@ -5,38 +5,7 @@ import java.util.Iterator;
 import Exceptions.*;
 import Interfaces.*;
 
-public class ListaDE<E> implements PositionList<E> {
-	//--------------- Clase Nodo Anidada ---------------
-	private static class Nodo<E> implements Position<E> {
-		private E element;
-		private Nodo<E> prev;
-		private Nodo<E> next;
-		
-		public Nodo(E e, Nodo<E> p, Nodo<E> n) {
-			element = e;
-			prev = p;
-			next= n;
-		}
-		
-		@SuppressWarnings("unused")
-		public Nodo(E e) {
-			this(e,null,null);
-		}
-		
-		public E element() { return element; }
-		
-		public Nodo<E> getPrev(){ return prev; }
-		
-		public Nodo<E> getNext(){ return next; }
-		
-		public void setElement(E e) { element = e; }
-		
-		public void setPrev(Nodo<E> p) { prev = p; }
-		
-		public void setNext(Nodo<E> n) { next = n; }
-	}
-	//--------- Final de la Clase Nodo Anidada ---------
-	
+public class ListaDE<E> implements PositionList<E> {	
 	protected Nodo<E> header;
 	protected Nodo<E> trailer;
 	protected int size;
@@ -143,17 +112,37 @@ public class ListaDE<E> implements PositionList<E> {
 	}
 
 	public Iterator<E> iterator() {
-		return new ElementIterator<>(this);
+		return new ElementIterator<E>(this);
 	}
 
 	public Iterable<Position<E>> positions() {
-        PositionList<Position<E>> toReturn = new ListaDE<Position<E>>();
+		PositionList<Position<E>> p = new ListaDE<Position<E>>();
+		if(!isEmpty()) {
+			Position<E> pos = null;
+			
+			try {
+				pos = first();
+			} catch (EmptyListException e) { e.printStackTrace(); }
+			
+			try {
+				while(pos != last()) {
+					p.addLast(pos);
+					pos = next(pos);
+				}
+			} catch (EmptyListException | InvalidPositionException | BoundaryViolationException e) {				
+				e.printStackTrace();
+			}	
+			p.addLast(pos);
+			} 
+		return p;
+		
+        /* PositionList<Position<E>> toReturn = new ListaDE<Position<E>>();
         Nodo<E> nodo = header.getNext();
         while(nodo != trailer) {
             toReturn.addLast(nodo);
             nodo = nodo.getNext();
         }
-        return toReturn;
+        return toReturn; */
     }
 	 
 	private Nodo<E> checkPosition(Position<E> p) throws InvalidPositionException {
@@ -176,5 +165,36 @@ public class ListaDE<E> implements PositionList<E> {
 			throw new InvalidPositionException("La posición no es de tipo Nodo E.");
 		}
 	}
+	
+	//--------------- Clase Nodo Anidada ---------------
+	private static class Nodo<E> implements Position<E> {
+		private E element;
+		private Nodo<E> prev;
+		private Nodo<E> next;
+		
+		public Nodo(E e, Nodo<E> p, Nodo<E> n) {
+			element = e;
+			prev = p;
+			next= n;
+		}
+		
+		@SuppressWarnings("unused")
+		public Nodo(E e) {
+			this(e,null,null);
+		}
+		
+		public E element() { return element; }
+		
+		public Nodo<E> getPrev(){ return prev; }
+		
+		public Nodo<E> getNext(){ return next; }
+		
+		public void setElement(E e) { element = e; }
+		
+		public void setPrev(Nodo<E> p) { prev = p; }
+		
+		public void setNext(Nodo<E> n) { next = n; }
+	}
+	//--------- Final de la Clase Nodo Anidada ---------
 	
 }

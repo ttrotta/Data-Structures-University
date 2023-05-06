@@ -22,8 +22,7 @@ public class ElementIterator<E> implements Iterator<E> {
 	}
 	
 	public boolean hasNext() {
-		// Hay siguiente si el cursor no está más allá de la última posición.
-		return cursor != null;
+		return cursor != null; // Hay siguiente si el cursor no está más allá de la última posición.
 	}
 
 	public E next() throws NoSuchElementException {

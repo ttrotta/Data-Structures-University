@@ -33,7 +33,7 @@ public class MapTest {
 
 	private Map<Integer, Integer> getMapeo() {
 
-		return new MarcosParaVer<Integer, Integer>();
+		return new MapeoConLista<Integer, Integer>();
 
 	}
 
