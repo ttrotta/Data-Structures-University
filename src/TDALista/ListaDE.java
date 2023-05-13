@@ -119,11 +119,9 @@ public class ListaDE<E> implements PositionList<E> {
 		PositionList<Position<E>> p = new ListaDE<Position<E>>();
 		if(!isEmpty()) {
 			Position<E> pos = null;
-			
 			try {
 				pos = first();
 			} catch (EmptyListException e) { e.printStackTrace(); }
-			
 			try {
 				while(pos != last()) {
 					p.addLast(pos);

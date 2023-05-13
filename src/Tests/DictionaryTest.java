@@ -20,7 +20,7 @@ public class DictionaryTest {
 	private Dictionary<Integer, Integer> s; // interface
 
 	private Dictionary<Integer, Integer> getDictionary() {
-		return new DiccionarioConLista<Integer, Integer>();
+		return new DiccionarioConHash<Integer, Integer>();
 	}
 
 	@Before
