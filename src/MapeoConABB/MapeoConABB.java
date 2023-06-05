@@ -54,11 +54,12 @@ public class MapeoConABB<K extends Comparable<K>,V> implements MapABB<K,V> {
 
 	public V remove(K key) throws InvalidKeyException {
 		checkKey(key);
-		V removed = null;
 		NodoABB<EntryABB<K,V>> n = buscar(key);
+		V removed = null;
 		if(n.element() != null) {
 			removed = n.element().getValue();
 			eliminar(n);
+			size--;
 		}
 		return removed;
 	}
@@ -133,50 +134,40 @@ public class MapeoConABB<K extends Comparable<K>,V> implements MapABB<K,V> {
 							n.getParent().setRight(n.getRight());
 						n.getRight().setParent(n.getParent());
 					} 
-					else 
-						n.setElement(removeMinimum(n.getRight()));
+					else {
+						NodoABB<EntryABB<K,V>> min = findMinimum(n.getRight());
+						n.setElement(min.element());
+						eliminar(min);
+					}
 				}
 			}
 		}
-		size--;
 	}
 	
 	private void eliminarRaiz() {
 		if(hasOnlyLeftChild(root)) {
-			NodoABB<EntryABB<K,V>> leftChild = root.getLeft();
-			leftChild.setParent(null);
-			root.setLeft(null);
-			root = leftChild;
+			root = root.getLeft();
+			root.setParent(null);
 		}
 		else {
 			if(hasOnlyRightChild(root)) {
-				NodoABB<EntryABB<K,V>> rightChild = root.getRight();
-				rightChild.setParent(null);
-				root.setRight(null);
-				root = rightChild;
+				root = root.getRight();
+				root.setParent(null);
 			}
 			else { 
-				root.setElement(removeMinimum(root.getRight()));
+				NodoABB<EntryABB<K,V>> min = findMinimum(root.getRight());
+				root.setElement(min.element());
+				eliminar(min);
 			}
 		}
 	}
-	
-	private EntryABB<K,V> removeMinimum(NodoABB<EntryABB<K,V>> p) {
-		if(p.getLeft().element() == null) {
-			EntryABB<K,V> toReturn = p.element();
-			if(p.getRight().element() == null) {
-				p.setElement(null);
-				p.setLeft(null);
-				p.setRight(null);
-			}
-			else {
-				p.getParent().setRight(p.getRight()); 
-				p.getRight().setParent(p.getParent());			
-			}
-			return toReturn;
+
+	private NodoABB<EntryABB<K,V>> findMinimum(NodoABB<EntryABB<K,V>> n){
+		NodoABB<EntryABB<K,V>> min = n;
+		while (!isExternal(min) || !hasOnlyRightChild(min)) {
+			min = n.getLeft();
 		}
-		else 
-			return removeMinimum(p.getLeft());
+		return min;
 	}
 	
 	private boolean isExternal(NodoABB<EntryABB<K,V>> p) {
@@ -195,29 +186,29 @@ public class MapeoConABB<K extends Comparable<K>,V> implements MapABB<K,V> {
 		if(e.getLeft().element() != null) {
 			inOrdenK(e.getLeft(),list);
 		}
+		list.addLast(e.element().getKey());
 		if(e.getRight().element() != null) {
 			inOrdenK(e.getRight(),list); 
 		}
-		list.addLast(e.element().getKey());
 	}
 	
 	private void inOrdenV(NodoABB<EntryABB<K,V>> e, PositionList<V> list) {
 		if(e.getLeft().element() != null) {
 			inOrdenV(e.getLeft(),list);
 		}
+		list.addLast(e.element().getValue());
 		if(e.getRight().element() != null) {
 			inOrdenV(e.getRight(),list); 
 		}
-		list.addLast(e.element().getValue());
 	}
 	
 	private void inOrdenE(NodoABB<EntryABB<K,V>> e, PositionList<EntryABB<K,V>> list) {
 		if(e.getLeft().element() != null) {
 			inOrdenE(e.getLeft(),list);
 		}
+		list.addLast(e.element());
 		if(e.getRight().element() != null) {
 			inOrdenE(e.getRight(),list); 
 		}
-		list.addLast(e.element());
 	}
 }

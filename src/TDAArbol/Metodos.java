@@ -1,5 +1,7 @@
 package TDAArbol;
 
+import java.util.Iterator;
+
 import Exceptions.*;
 import Interfaces.*;
 import TDALista.*;
@@ -26,7 +28,7 @@ public class Metodos {
 	
 	// Ejercicio 5 a)
 	public static <E> Iterable<E> recPorNivel(Tree<E> T) { 
-	    PositionList<E> list = new ListaDE<>(); 
+	    PositionList<E> list = new ListaDE<E>(); 
 	    Queue<TNodo<E>> cola = new ColaEnlazada<TNodo<E>>();
 	    try {
 
@@ -85,19 +87,210 @@ public class Metodos {
 
 	    return list;
 	}
-
+	
+	// Profundidad
+	public static <E> int profundidad(Tree<E> T, Position<E> v ) {
+		try {
+			if (T.isRoot(v) )
+				return 0;
+			else
+				return 1 + profundidad(T, T.parent(v));
+		} catch (InvalidPositionException | BoundaryViolationException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	
+	// Altura de O(n^2) mal
+	public static <E> int alturaIneficiente(Tree<E> T) {
+		int h = 0;
+		for(Position<E> v : T.positions())
+		try {
+			if(T.isExternal(v))
+				h = Math.max( h, profundidad(T,v));		
+		} catch (InvalidPositionException e) {
+				e.printStackTrace();
+			}
+		return h;
+	}
+	
+	// Altura de O(n) bien
+	public static <E> int altura(Tree<E> T, Position<E> v ) {
+		try {
+			if(T.isExternal(v))
+				return 0;
+			else {
+				int h = 0;
+				for(Position<E> w : T.children(v))
+					h = Math.max(h, altura(T,w));
+				return 1+h;
+			}
+		} catch (InvalidPositionException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
 	
 	// Ejercicio 6 a)
+	// Escriba un método tal que, dado un árbol A, lo recorra en orden previo y devuelva una lista
+	// con referencias a las posiciones de A que sean hijos extremos izquierdos, y que no sea hojas.	
+	public static <E> Iterable<Position<E>> extremoIzquierdo(Tree<E> A){
+		PositionList<Position<E>> list = new ListaDoblementeEnlazada<Position<E>>();
+		try {
+			if(!A.isEmpty()) {
+				extremoIzquierdoRec(A.root(),A,list);			
+			}			
+		}catch(EmptyTreeException e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
+	private static <E> void extremoIzquierdoRec(Position<E> v, Tree<E> A, PositionList<Position<E>> list) {
+		try {
+			Iterator<Position<E>> it = A.children(v).iterator();
+			Position<E> aux = null;
+			//Pregunto si es extremo izquierdo y si no tiene hijos
+			if(it.hasNext()) { // Se encarga de poner SÓLO el hijo izquierdo de nivel 1
+				aux = it.next();
+				if(A.isInternal(aux)) {
+					list.addLast(aux);
+				}
+			}
+			for(Position<E> w : A.children(v)) {
+				extremoIzquierdoRec(w,A,list);
+			}
+
+		}catch(InvalidPositionException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// Ejericico 6 b)
+	/* Escriba un método tal que, dado un árbol A, elimine todo hijo extremo izquierdo N (que no	
+	   sea hoja) y luego ubique a sus hijos como nuevos hijos del padre de N. 
+	*/
+	@SuppressWarnings("unchecked")
+	public static <E> void eliminarHijoIzquierdo(Tree<E> T) {
+		try { 
+			for(Position<E> v : extremoIzquierdo(T)) {
+				for(Position<E> w : T.children(v)) {
+					((TNodo<Character>) w.element()).setPadre((TNodo<Character>) T.parent(v));
+					((TNodo<Character>) T.parent(v)).getHijos().addFirst((TNodo<Character>) w);
+					T.removeInternalNode(w);
+				}
+				
+			}
+		} catch (InvalidPositionException | BoundaryViolationException e) {
+				e.printStackTrace();
+			}
+	}
 	
 	// Ejericico 6 c)
 	/* Escriba un método tal que, dado un árbol A, elimine todas las hojas de A (deben quedar 
 	   solo los nodos interiores del árbol original).
 	*/
-	
 	public static <E> void eliminarHojas(Tree<E> A) {
-		
+		try {
+			eliminarHojasRec(A.root(),A);
+		} catch (EmptyTreeException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static <E> void eliminarHojasRec(Position<E> v, Tree<E> A) {
+		try {
+			if(A.isExternal(v))
+				A.removeExternalNode(v);
+			for(Position<E> w : A.children(v)) {
+				eliminarHojasRec(w,A);
+			}
+		} catch (InvalidPositionException e) {
+			e.printStackTrace();
+		}
 	}
 	
+	// Ejericico 6 d)
+	// Realice un método que elimine todos los nodos que tengan un rótulo R.
+	@SuppressWarnings("unused")
+	private static <E> void eliminarNodo(E r, Tree<E> A) {
+		try {
+			eliminarNodoRec(r, A.root(), A);
+		} catch (EmptyTreeException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static <E> void eliminarNodoRec(E r, Position<E> v, Tree<E> A) {
+		if(v.element() == r) {
+			try {
+				A.removeNode(v);
+			} catch (InvalidPositionException e) {
+				e.printStackTrace();
+			}
+		}
+		try {
+			for(Position<E> w : A.children(v)) {
+				eliminarNodoRec(r,w,A);
+			}
+		} catch (InvalidPositionException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// Ejercicio 6 e y f)
+    /* 
+    Escriba un método tal que dados dos nodos N1 y N2 de un árbol A, indique si existe un
+	camino entre N1 y N2. Indique qué diferencias existirán entre solución propuesta y una
+	alternativa en la que no se contara con la referencia al nodo padre en la estructura de
+	datos de los nodos del árbol. 
+	*/
+	public static <E> PositionList<E> camino(Position<E> n1, Position<E> n2) {
+		PositionList<E> camino = new ListaDoblementeEnlazada<E>();
+		try {
+			TNodo<E> nodo1 = checkPosition(n1);
+			TNodo<E> nodo2 = checkPosition(n2);
+			if(depth(nodo1) <= depth(nodo2)) {
+				searchUp(nodo1, nodo2, camino);
+			}
+			else {
+				searchUp(nodo2, nodo1, camino);
+			}
+		} catch (InvalidPositionException e) {
+			throw new RuntimeException(e);
+		}
+		return camino;
+	}
+
+	private static <E> void searchUp(TNodo<E> ancestro, TNodo<E> descendiente, PositionList<E> camino){
+		int a = depth(ancestro);
+		int b = depth(descendiente);
+		PositionList<E> camino2 = new ListaDoblementeEnlazada<E>();
+
+		while (ancestro != descendiente) {
+			camino.addLast(descendiente.element());
+			descendiente = descendiente.getPadre();
+			if(a == b) {
+				camino2.addFirst(ancestro.element());
+				ancestro = ancestro.getPadre();
+				a--;
+			}
+			b--;
+		}
+		camino.addLast(ancestro.element());
+		for(E e : camino2) {
+			camino.addLast(e);
+		}
+	}
+
+	public static <E> int depth(TNodo<E> v) {
+		if(v.getPadre() != null){
+			return 0;
+		}
+		else {
+			return 1 + depth(v.getPadre());
+		}
+	}
+	    
 	// Ejercicio 9
 	// Dadas dos posiciones P1 y P2 y un árbol T, retornar el ancestro común más cercano entre P1 y P2. 
 	public static <E> Position<E> ancestroComun(Position<E> p1, Position<E> p2, Tree<E> T) {
@@ -266,6 +459,7 @@ public class Metodos {
 			Position<Character> pz = arbolDos.addLastChild(pd, 'Z');
 			
 			Position<Character> pm = arbolDos.addLastChild(pl, 'M');
+			Position<Character> pp = arbolDos.addLastChild(pd, 'L');
 			arbolDos.addLastChild(pm, 'P');
 			
 			for(Position<Character> elem : arbolDos.positions()) {
@@ -297,6 +491,15 @@ public class Metodos {
 			Position<Character> ancestro4 = ancestroComun(pg,ph,arbolDos);
 			System.out.println("El ancestro en común entre g y h debería ser h: "+ ((TNodo<Character>) ancestro4).element());
 			
+			Position<Character> ancestro5 = ancestroComun(pk,pp,arbolDos);
+			System.out.println("El ancestro en común entre k y p debería ser A: "+ ((TNodo<Character>) ancestro5).element());
+			
+			Position<Character> ancestro6 = ancestroComun(pb,pp,arbolDos);
+			System.out.println("El ancestro en común entre b y p debería ser A: "+ ((TNodo<Character>) ancestro6).element());
+			
+			System.out.println();
+			for(Position<Character> p : extremoIzquierdo(arbolDos))
+				System.out.print(p.element()+" ");
 			System.out.println();
 			System.out.println();
 			
@@ -306,6 +509,7 @@ public class Metodos {
 			
 			System.out.println();
 			System.out.println();
+			
 
 		} catch (InvalidOperationException | EmptyTreeException | InvalidPositionException e) {
 			e.printStackTrace();

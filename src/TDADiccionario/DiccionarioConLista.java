@@ -36,35 +36,7 @@ public class DiccionarioConLista<K,V> implements Dictionary<K,V> {
     	}
     	return toReturn;
 	}
-	
-	
-	/* public Entry<K,V> find(K key) throws InvalidKeyException {
-		Entry<K,V> toReturn = null;
-		checkKey(key); 
-		boolean found = false;
-		Position<Entry<K,V>> lastPos = null;
-		Position<Entry<K,V>> pos = null;
-		try {
-			lastPos = D.last();
-			pos = D.first();
-		} catch (EmptyListException e) {
-			e.printStackTrace();
-		}
-		
-		while(pos != lastPos && !found) {
-			if(pos.element().getKey().equals(key)) {
-				toReturn = pos.element();
-				found = true;
-			}
-			try {
-				pos = D.next(pos);
-			} catch (InvalidPositionException | BoundaryViolationException e) {
-				e.printStackTrace();
-			} 
-		}
-		return toReturn;
-	}
-*/
+
 	public Iterable<Entry<K,V>> findAll(K key) throws InvalidKeyException {
 		PositionList<Entry<K,V>> l = new ListaDE<Entry<K,V>>();
 		checkKey(key);

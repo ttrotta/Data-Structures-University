@@ -51,7 +51,7 @@ public interface BinaryTree<E> extends GTTree<E>
 	 * @param E R�tulo que se asignar� a la ra�z del �rbol.
 	 * @throws InvalidOperationException si el �rbol ya tiene un nodo ra�z.
 	 */
-	// public Position<E> createRoot(E r) throws InvalidOperationException;
+	public Position<E> createRoot(E r) throws InvalidOperationException;
 	
 	
 	/**
@@ -64,7 +64,6 @@ public interface BinaryTree<E> extends GTTree<E>
 	 */
 	public Position<E> addLeft(Position<E> v, E r) throws InvalidOperationException, InvalidPositionException;
 
-
 	/**
 	 * Agrega un nodo con r�tulo r como hijo derecho de un nodo dado.
 	 * @param r R�tulo del nuevo nodo.
@@ -73,9 +72,7 @@ public interface BinaryTree<E> extends GTTree<E>
 	 * @throws InvalidPositionException si la posici�n pasada por par�metro es inv�lida o el �rbol est� vac�o.
 	 * @throws InvalidOperationException si v ya tiene un hijo derecho.
 	 */
-	public Position<E> addRight(Position<E> v, E r) throws InvalidOperationException, 
-										InvalidPositionException;
-
+	public Position<E> addRight(Position<E> v, E r) throws InvalidOperationException, InvalidPositionException;
 
 	/**
 	 * Elimina el nodo referenciado por una posici�n dada. Si el nodo tiene un �nico hijo, el nodo eliminado ser� reemplazado por su �nico hijo.

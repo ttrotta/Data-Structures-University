@@ -8,6 +8,8 @@ import Interfaces.BinaryTree;
 import Interfaces.Position;
 import Interfaces.PositionList;
 import TDALista.*;
+import java.util.Queue;
+import java.util.LinkedList;
 
 public class ArbolBinario<E> implements BinaryTree<E> {
 	protected BTPosition<E> root;
@@ -17,7 +19,7 @@ public class ArbolBinario<E> implements BinaryTree<E> {
 		root = null;
 		size = 0;
 	}
-
+	
 	public int size() {
 		return size;
 	}
@@ -42,7 +44,7 @@ public class ArbolBinario<E> implements BinaryTree<E> {
 	}
 
 	public E replace(Position<E> v, E e) throws InvalidPositionException {
-		BTNodo<E> nodo = checkPosition(v);
+		BTPosition<E> nodo = checkPosition(v);
 		E toReturn = nodo.element();
 		nodo.setElement(e);
 		return toReturn;
@@ -55,10 +57,10 @@ public class ArbolBinario<E> implements BinaryTree<E> {
 	}
 
 	public Position<E> parent(Position<E> v) throws InvalidPositionException, BoundaryViolationException {
-		BTNodo<E> nodo = checkPosition(v);
+		BTPosition<E> nodo = checkPosition(v);
 		if(nodo == root)
 			throw new BoundaryViolationException("La raíz no tiene padre.");
-		return nodo.getPadre();
+		return nodo.getParent();
 	}
 
 	public Iterable<Position<E>> children(Position<E> v) throws InvalidPositionException {
@@ -84,7 +86,7 @@ public class ArbolBinario<E> implements BinaryTree<E> {
 	}
 
 	public boolean isRoot(Position<E> v) throws InvalidPositionException {
-		BTNodo<E> nodo = checkPosition(v);
+		BTPosition<E> nodo = checkPosition(v);
 		return nodo == root;
 	}
 
@@ -97,36 +99,36 @@ public class ArbolBinario<E> implements BinaryTree<E> {
 	}
 
 	public Position<E> left(Position<E> v) throws InvalidPositionException, BoundaryViolationException {
-		BTNodo<E> nodo = checkPosition(v);
+		BTPosition<E> nodo = checkPosition(v);
 		if(nodo.getLeft() == null)
 			throw new BoundaryViolationException("No existe el BTNodo izquierdo.");
 		return nodo.getLeft();
 	}
 
 	public Position<E> right(Position<E> v) throws InvalidPositionException, BoundaryViolationException {
-		BTNodo<E> nodo = checkPosition(v);
+		BTPosition<E> nodo = checkPosition(v);
 		if(nodo.getRight() == null)
 			throw new BoundaryViolationException("No existe el BTNodo derecho.");
 		return nodo.getRight();
 	}
 
 	public boolean hasLeft(Position<E> v) throws InvalidPositionException {
-		BTNodo<E> nodo = checkPosition(v);
+		BTPosition<E> nodo = checkPosition(v);
 		return nodo.getLeft() != null;
 	}
 
 	public boolean hasRight(Position<E> v) throws InvalidPositionException {
-		BTNodo<E> nodo = checkPosition(v);
+		BTPosition<E> nodo = checkPosition(v);
 		return nodo.getRight() != null;
 	}
 
 	public Position<E> addLeft(Position<E> v, E r) throws InvalidOperationException, InvalidPositionException {
 		if(isEmpty())
 			throw new InvalidPositionException("El árbol está vacío.");
-		BTNodo<E> nodo = checkPosition(v);
+		BTPosition<E> nodo = checkPosition(v);
 		if(hasLeft(v))
 			throw new InvalidOperationException("Ya hay un hijo derecho en la posición.");
-		BTNodo<E> toInsert = new BTNodo<E>(r, null, null, (BTNodo<E>) v);
+		BTPosition<E> toInsert = new BTNodo<E>(r, null, null, (BTNodo<E>) v);
 		nodo.setLeft(toInsert);
 		size++;
 		return toInsert;
@@ -135,10 +137,10 @@ public class ArbolBinario<E> implements BinaryTree<E> {
 	public Position<E> addRight(Position<E> v, E r) throws InvalidOperationException, InvalidPositionException {
 		if(isEmpty())
 			throw new InvalidPositionException("El árbol está vacío.");
-		BTNodo<E> nodo = checkPosition(v);
+		BTPosition<E> nodo = checkPosition(v);
 		if(hasRight(v))
 			throw new InvalidOperationException("Ya hay un hijo derecho en la posición.");
-		BTNodo<E> toInsert = new BTNodo<E>(r, null, null, (BTNodo<E>) v);
+		BTPosition<E> toInsert = new BTNodo<E>(r, null, null, (BTNodo<E>) v);
 		nodo.setRight(toInsert);
 		size++;
 		return toInsert;
@@ -146,7 +148,7 @@ public class ArbolBinario<E> implements BinaryTree<E> {
 
 	public E remove(Position<E> v) throws InvalidOperationException, InvalidPositionException {
 		BTNodo<E> toRemove = checkPosition(v);
-		BTNodo<E> parentRemove = (BTNodo<E>) toRemove.getPadre();
+		BTNodo<E> parentRemove = (BTNodo<E>) toRemove.getParent();
 		BTNodo<E> left = (BTNodo<E>) toRemove.getLeft();
 		BTNodo<E> right = (BTNodo<E>) toRemove.getRight();
 		if(left != null && right != null) // si no tiene al menos un hijo izq o der (puede no tener ninguno)
@@ -196,23 +198,72 @@ public class ArbolBinario<E> implements BinaryTree<E> {
 	}
 
 	public void attach(Position<E> r, BinaryTree<E> T1, BinaryTree<E> T2) throws InvalidPositionException {
-		BTNodo<E> nodo = checkPosition(r);
+		BTPosition<E> aux = checkPosition(r);
+		if(isEmpty()) throw new InvalidPositionException("El árbol está vacío.");
+		if(isInternal(r)) throw new InvalidPositionException("No es posible enlazar un sub-árbol en un nodo interno.");
+        
 		try {
-            if(isInternal(r))
-                throw new InvalidPositionException("No es posible enlazar un sub árbol en un nodo interno.");
-            if(!T1.isEmpty()){
-                BTNodo<E> rootLeft = (BTNodo<E>) T1.root();
-                nodo.setLeft(rootLeft);
-                size += T1.size();
-            }
-            if(!T2.isEmpty()) {
-                BTNodo<E> rootRight = (BTNodo<E>) T2.root();
-                nodo.setRight(rootRight);
-                size += T2.size();
-            }
-        } catch (EmptyTreeException e) {
-            throw new RuntimeException(e);
-        }
+			if(!T1.isEmpty()) {				
+				BTPosition<E> rootT1 = checkPosition(T1.root());
+				BTPosition<E> nodoT1 = new BTNodo<E>(rootT1.element(),null, null, aux);
+				aux.setLeft(nodoT1);
+				attachClonarHijos(nodoT1, rootT1);
+			}
+			if(!T2.isEmpty()) {				
+
+				BTPosition<E> rootT2 = checkPosition(T2.root());
+				BTPosition<E> nodoT2 = new BTNodo<E>(rootT2.element(),null,null,aux);
+				aux.setRight(nodoT2);
+				attachClonarHijos(nodoT2, rootT2);
+			}
+
+
+		} catch (EmptyTreeException e) {
+			e.printStackTrace();
+		}
+		size++;
+	}
+	
+	private void attachClonarHijos(BTPosition<E> r, BTPosition<E> tPos) {
+		BTPosition<E> aux;
+		if(tPos.getLeft() != null) {
+			aux = new BTNodo<E>(tPos.element(),null,null,r);
+			r.setLeft(aux);
+			attachClonarHijos(aux,tPos.getLeft());
+		}
+		if(tPos.getRight() != null) {
+			aux = new BTNodo<E>(tPos.element(),null,null,r);
+			r.setRight(aux);
+			attachClonarHijos(aux,tPos.getRight());
+		}
+	}
+	
+	// Ejercicio 1 e)
+	public BinaryTree<E> clone() {
+		BinaryTree<E> clone = new ArbolBinario<E>();
+		try {
+			if(!isEmpty()) {
+				BTPosition<E> rootClone = (BTNodo<E>)clone.createRoot(root.element());
+				cloneRec(clone,(BTNodo<E>)this.root, rootClone);
+			}
+		} catch (InvalidOperationException e) { throw new RuntimeException(e); }
+		return clone;
+	}
+	
+	private void cloneRec(BinaryTree<E> clone, BTPosition<E> root, BTPosition<E> rootClone) {
+		BTNodo<E> posInsertClone;
+		try {
+			if(hasLeft(root)) {
+				posInsertClone = (BTNodo<E>) clone.addLeft(rootClone,root.getLeft().element());
+				cloneRec(clone, (BTNodo<E>) root.getLeft(), posInsertClone);
+			}
+			if(hasRight(root)) {
+				posInsertClone = (BTNodo<E>) clone.addRight(rootClone, root.getRight().element());
+				cloneRec(clone, (BTNodo<E>) root.getRight(), posInsertClone);
+			}
+		} catch (InvalidPositionException | InvalidOperationException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	private void preOrden(BTNodo<E> v, PositionList<Position<E>> list) {
@@ -227,6 +278,32 @@ public class ArbolBinario<E> implements BinaryTree<E> {
 		}
 	}
 	
+	// Ejercicio 2 b)
+	public BinaryTree<E> mirror() {
+		BinaryTree<E> mirror = this.clone();
+		try {
+			BTPosition<E> rootMirror = (BTNodo<E>) mirror.root();
+			mirrorRecursive(rootMirror);
+		} catch (EmptyTreeException e) {
+			throw new RuntimeException(e);
+		}
+		return mirror;
+ 	}
+	
+	private void mirrorRecursive(BTPosition<E> nodo) {
+		invertirHijos(nodo);
+		if(nodo.getLeft() != null)
+			mirrorRecursive((BTNodo<E>)nodo.getLeft());
+		if(nodo.getRight() != null)
+			mirrorRecursive((BTNodo<E>)nodo.getRight());
+	}
+	
+	private void invertirHijos(BTPosition<E> nodo) {
+		BTPosition<E> aux  = (BTNodo<E>) nodo.getLeft();
+		nodo.setLeft(nodo.getRight());
+		nodo.setRight(aux);
+	}
+	
 	private BTNodo<E> checkPosition(Position<E> v) throws InvalidPositionException {
 		 BTNodo<E> nodo = null;
 		 if(v == null)
@@ -238,4 +315,34 @@ public class ArbolBinario<E> implements BinaryTree<E> {
 		 }
 		 return nodo;
 	}
+	
+	public void recorrerPorNiveles(BTNodo<E> arbol) {
+	    Queue<BTNodo<E>> cola = new LinkedList<>();
+	    cola.clear();
+	    cola.add(arbol);
+	    while (!(cola.isEmpty())) {
+	    	BTNodo<E> temp = cola.remove();
+	        System.out.print(temp.element() + " ");
+	        if (temp.getLeft() != null) {
+	            cola.add((BTNodo<E>) temp.getLeft());
+	        }
+	        if (temp.getRight() != null) {
+	            cola.add((BTNodo<E>) temp.getRight());
+	        }
+	    }
+	}
+	
+	public void recorrerPorNiveles() {
+		recorrerPorNivelesRec((BTNodo<E>) root,1);
+		System.out.println();
+	}
+
+	private void recorrerPorNivelesRec(BTNodo<E> nodo, int nivel){
+        if(nodo != null){
+        	recorrerPorNivelesRec((BTNodo<E>) nodo.getLeft(),nivel+1);
+            System.out.println(nodo.element() + "("+nivel+") - ");
+            recorrerPorNivelesRec((BTNodo<E>) nodo.getRight(),nivel+1);
+        }
+    }
 }
+

@@ -21,4 +21,8 @@ public class NodoABB<E extends Comparable<E>> {
 	public void setPadre(NodoABB<E> p) { padre = p; }
 	public void setIzq(NodoABB<E> i) { izq = i; }
 	public void setDer(NodoABB<E> d) { der = d; }
+	
+	public String toString() {
+        return String.valueOf(rotulo);
+	}
  }

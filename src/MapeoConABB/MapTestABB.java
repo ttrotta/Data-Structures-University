@@ -1,8 +1,8 @@
 package MapeoConABB;
 
 /**
- * Class: MapTest
- * @author Mar�a Luj�n Ganuza (mlg@cs.uns.edu.ar)
+ * Class: MapTestABB
+ * @author María Luján Ganuza (mlg@cs.uns.edu.ar)
  *         Estructuras de Datos _ Primer Cuatrimestre 2013
  *         Departamento de Cs. e Ing. de la Computaci�n.
  *  @version: 2.0

@@ -5,7 +5,7 @@ public interface BTPosition<E> extends Position<E> {
 	 * 
 	 * @return
 	 */
-	public BTPosition<E> getPadre();
+	public BTPosition<E> getParent();
 	
 	/**
 	 * 

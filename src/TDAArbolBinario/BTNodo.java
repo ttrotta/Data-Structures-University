@@ -16,7 +16,7 @@ public class BTNodo<E> implements BTPosition<E> {
 		return element;
 	}
 
-	public BTPosition<E> getPadre() {
+	public BTPosition<E> getParent() {
 		return parent;
 	}
 	
@@ -43,5 +43,8 @@ public class BTNodo<E> implements BTPosition<E> {
 	public void setRight(BTPosition<E> r) {
 		right = r;
 	}
-
+	
+	public String toString() {
+        return String.valueOf(element);
+	}
 }

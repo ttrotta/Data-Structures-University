@@ -167,32 +167,6 @@ public class Arbol<E> implements Tree<E>{
 		return nuevo;
 	}
 
-	/* public void removeExternalNode(Position<E> p) throws InvalidPositionException {
-		if(isEmpty())
-			throw new InvalidPositionException("El árbol está vacío.");
-		TNodo<E> nodo = checkPosition(p);
-		if(!nodo.getHijos().isEmpty())
-			throw new InvalidPositionException("p no es un nodo hoja.");
-		TNodo<E> padre = nodo.getPadre();
-		PositionList<TNodo<E>> hijosPadre = padre.getHijos();
-		boolean found = false;
-		Interfaces.Position<TNodo<E>> pp = null;
-		Iterable<Interfaces.Position<TNodo<E>>> posiciones = hijosPadre.positions();
-		Iterator<Interfaces.Position<TNodo<E>>> it = posiciones.iterator();
-		while(it.hasNext() && !found) {
-			pp = it.next();
-			if(pp.element() == nodo)
-				found = true;
-		}
-		if(!found)
-			throw new InvalidPositionException("p no aparece en la lista de hijos de su padre: !no eliminé!");
-		hijosPadre.remove(pp);
-		nodo.setElement(null);
-		size--;
-		if(isEmpty())
-			root = null;
-	} */
-	
 	public void removeExternalNode(Position<E> p) throws InvalidPositionException {
 		if(isEmpty()) 
 			 throw new InvalidPositionException("El árbol está vacío.");
@@ -252,6 +226,29 @@ public class Arbol<E> implements Tree<E>{
 	     }
 	}
 	
+	
+	// Ejercicio 7
+	/* Agregue una operación a la clase Árbol definida en el ejercicio 4 que, dado un rótulo r y un
+	número entero A>0, por cada nodo con altura igual a A del árbol receptor del mensaje inserta
+	en dicho nodo un hijo extremo derecho con rótulo R. Esta operación no debe generar un
+	nuevo árbol sino, modificar el árbol que recibe el mensaje. Considere que no tiene acceso a la
+	estructura de la clase lista, pero si puede utilizarla como un TDA. 
+	*/
+	public void agregarNodoPorAltura(int A, E r) {
+		try {
+			for(Position<E> p : positions()) {
+				if(altura(this,p) == A) {
+					TNodo<E> nodoConA = checkPosition(p);
+					TNodo<E> toInsert = new TNodo<E>(r,nodoConA);
+					nodoConA.getHijos().addLast(toInsert);
+				}
+			} 
+		} catch (InvalidPositionException e) {
+			e.printStackTrace();
+
+		}
+	}
+	
 	// Ejercicio 8
 	public void invertirHijos(E r) {
 		invertirHijosRec(r,root);
@@ -304,4 +301,21 @@ public class Arbol<E> implements Tree<E>{
 		for(TNodo<E> p : r.getHijos())
 			recPreOrdenPos(p,l);
 	}
+	
+	public int altura(Tree<E> T, Position<E> v ) {
+		try {
+			if(T.isExternal(v))
+				return 0;
+			else {
+				int h = 0;
+				for(Position<E> w : T.children(v))
+					h = Math.max(h, altura(T,w));
+				return 1+h;
+			}
+		} catch (InvalidPositionException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	
 }

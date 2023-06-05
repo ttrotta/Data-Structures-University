@@ -2,11 +2,15 @@ package TDAArbolBinario;
 
 import java.util.Comparator;
 
-public class ArbolBinarioDeBusqueda<E extends Comparable<E>> {
+import Interfaces.Stack;
+import TDAPila.*;
+import Exceptions.EmptyStackException;
+
+public class ArbolBB<E extends Comparable<E>> {
 	protected NodoABB<E> root;
 	protected Comparator<E> comp;
 	
-	public ArbolBinarioDeBusqueda(Comparator <E> comp) {
+	public ArbolBB(Comparator <E> comp) {
 		root = new NodoABB<E>(null,null); // <- nodo dummy
 		this.comp = comp;
 	}
@@ -114,5 +118,62 @@ public class ArbolBinarioDeBusqueda<E extends Comparable<E>> {
 		}
 		else 
 			return eliminarMinimo(p.getIzq());
+	}
+	
+	// Ejercicio 7
+	/* Resuelva el siguiente problema: Dados dos ABB A y B se desea construir un tercer ABB C donde
+ 	 los elementos de C son aquellos que se hallan en A y no en B. Asuma que la solución al
+	 problema es un método de la clase ABB y que A recibe el mensaje. Estime el orden del tiempo
+	 de ejecución de su solución justificando apropiadamente.
+	*/
+	public ArbolBB<E> diferencia(ArbolBB<E> B) {
+		ArbolBB<E> C = new ArbolBB<E>(comp);
+		diferenciaRec(root,B,C);
+		return C;
+	}
+	
+	private void diferenciaRec(NodoABB<E> a, ArbolBB<E> B, ArbolBB<E> C) {
+		NodoABB<E> elementoB = B.buscar(a.getRotulo());
+		NodoABB<E> aux = null;
+		if(elementoB.getRotulo() == null) {
+			aux = C.buscar(a.getRotulo()); // <-- Ask
+			aux.setRotulo(a.getRotulo());
+			C.expandir(aux);
+		}
+		if(a.getIzq().getRotulo() != null) diferenciaRec(a.getIzq(),B,C);
+		if(a.getDer().getRotulo() != null) diferenciaRec(a.getDer(),B,C);
+
+	}
+	
+
+	// Ejercicio 9
+	/* Programe una operación llamada Ejercicio14 que forma parte de la clase árbol binario de
+	búsqueda (y por lo tanto tiene acceso a la estructura interna del mismo) que recibe un rótulo
+	de nodo y debe retornar el rótulo del predecesor inorder de dicho nodo. Programe todas las
+	operaciones auxiliares de árbol binario de búsqueda que use. Calcule el orden del tiempo de
+	ejecución de su solución justificando apropiadamente. */
+	public E ejercicio14(E rotulo) {
+		E toReturn = null;
+		Stack<E> pila = new PilaEnlazada<E>();
+		PreRotuloRec(pila, root);
+		boolean encontre = false;
+		try {
+			while(!pila.isEmpty() && !encontre) {
+				if(pila.top().equals(rotulo)) {
+					encontre = true;
+				}
+				toReturn = pila.pop();
+			}			
+			if(!pila.isEmpty()) toReturn = pila.pop();
+		}catch(EmptyStackException e) {
+			e.printStackTrace();
+		}
+		return toReturn;
+	}
+	
+	private void PreRotuloRec(Stack<E> p, NodoABB<E> nodo) {
+		if(nodo.getIzq().getRotulo() != null) PreRotuloRec(p,nodo.getIzq());
+		p.push(nodo.getRotulo());
+		if(nodo.getDer().getRotulo() != null) PreRotuloRec(p,nodo.getDer());
 	}
 }

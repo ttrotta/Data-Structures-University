@@ -6,7 +6,7 @@ package MapeoConABB;
  * @author Thiago Trotta
  */
 
-public interface EntryABB<K extends Comparable<K>, V> {
+public interface EntryABB<K, V> {
 	/**
 	 * Consulta la clave de la entrada.
 	 * @return la clave de la entrada.
