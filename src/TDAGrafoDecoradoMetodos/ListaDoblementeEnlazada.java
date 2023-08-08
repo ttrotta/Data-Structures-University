@@ -1,11 +1,11 @@
-package TDALista;
+package TDAGrafoDecoradoMetodos;
 
 import java.util.Iterator;
 
 import Exceptions.*;
-import Interfaces.*;
+import Interfaces.Position;
 
-// La hice xq me da tic usar ListaDE pero tampoco iba a cambiar todo lo otro xD.
+// En esta versión de Lista implemento el clone para los metodos de Grafo
 public class ListaDoblementeEnlazada<E> implements PositionList<E> {	
 	protected Nodo<E> header;
 	protected Nodo<E> trailer;
@@ -142,6 +142,17 @@ public class ListaDoblementeEnlazada<E> implements PositionList<E> {
         }
         return toReturn; */
     }
+	
+	public PositionList<E> clone() {
+		PositionList<E> list = new ListaDoblementeEnlazada<E>();
+		E element;
+		Iterator<E> it = iterator();
+		while(it.hasNext()) {
+			element = it.next();
+			list.addLast(element);
+		}
+		return list;
+	}
 	
 	private Nodo<E> checkPosition(Position<E> p) throws InvalidPositionException {
 		try {

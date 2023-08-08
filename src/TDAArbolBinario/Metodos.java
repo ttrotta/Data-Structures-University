@@ -4,6 +4,7 @@ import Interfaces.BinaryTree;
 import Interfaces.Position;
 import Interfaces.PositionList;
 import Interfaces.Stack;
+
 import Exceptions.*;
 import TDAPila.*;
 import TDALista.*;
@@ -148,74 +149,56 @@ public class Metodos {
 		}
 	}
 	
+	// Ejercicio 3 b) Equals en Profundidad de un Árbol Binario
+	public static <E> boolean equivalentes(Position<E> p1, BinaryTree<E> A1, Position<E> p2, BinaryTree<E> A2) {
+		boolean retorno = false;
+		if(p1 == null && p2 == null)
+			return true;
+		else {
+			if(p1 == null || p2 == null)
+				return false;
+			else {
+				try {
+					if(p1.element().equals(p2.element())) {
+						Position<E> sub1, sub2;
+						if(A1.hasLeft(p1)) sub1 = A1.left(p1);
+						else sub1 = null;
+
+						if(A2.hasLeft(p2)) sub2 = A2.left(p2);
+						else sub2 = null;
+
+						retorno = equivalentes(sub1, A1, sub2, A2);
+						// Si el subarbol izquierdo es igual, pasamos al derecho
+						if(retorno) {
+							if(A1.hasRight(p1)) sub1 = A1.right(p1);
+							else sub1 = null;
+
+							if(A2.hasRight(p2)) sub2 = A2.right(p2);
+							else sub2 = null;
+
+							retorno = equivalentes(sub1, A1, sub2, A2);
+						}
+					}
+				} catch(InvalidPositionException | BoundaryViolationException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return retorno;
+	}
+
 	// Ejercicio 3 c)
 	// Escriba un método tal que dados dos árboles A y A1 determine si A1 es un subárbol de A
-	public static <E> boolean esSub(BinaryTree<E> A1, BinaryTree<E> A) {
-		boolean es = false;
-		try {
-			es = preBusqueda((BTNodo<E>) A1.root(), (BTNodo<E>) A.root(), A, A1);
+	public static <E> boolean esSubArbol(BinaryTree<E> A1, BinaryTree<E> A) {
+		Position<E> raizA1 = null;
+		try { raizA1 = A1.root(); } catch(EmptyTreeException e) { e.printStackTrace(); }
+		for(Position<E> p : A.positions()) {
+			if(equivalentes(raizA1,A1,p,A)) 
+				return true;
 		}
-		catch (EmptyTreeException e) {
-			
-		}
-		return es;
+		return false;
 	}
 	
-	private static<E> boolean preBusqueda(BTNodo<E> n1, BTNodo<E> n, BinaryTree<E> t, BinaryTree<E> t1) {
-		boolean es = false;
-		try {
-			if (n1.element().equals(n.element())) {
-				es = preSubArbol(n,n1,t,t1);
-			}
-			else {
-				for (Position<E> h : t.children(n)) {
-					if (es == false)
-						es = preBusqueda(n1, (BTNodo<E>) h, t, t1);
-				}
-			}
-		} catch (InvalidPositionException e) {
-			e.printStackTrace();
-		}
-		return es;
-	}
-	
-	private static<E> boolean preSubArbol(BTNodo<E> n, BTNodo<E> n1, BinaryTree<E> t, BinaryTree<E> t1) {
-		boolean esSub = true;
-		try {
-			if (!n.element().equals(n1.element())) {
-				esSub = false;
-			}
-			else {
-				//Controlando hijos izquierdos de n y n1
-				if (t.hasLeft(n) && t1.hasLeft(n1)){
-					esSub = preSubArbol((BTNodo<E>) t.left(n), (BTNodo<E>) t1.left(n1), t, t1);
-				}
-				else {
-					if (!t.hasLeft(n) && !t1.hasLeft(n1))
-						esSub = true;
-					else
-						esSub = false;
-				}
-				//Controlando hijos derechos de n y n1
-				if (esSub) {
-					if (t.hasRight(n) && t1.hasRight(n1)){
-						esSub = preSubArbol((BTNodo<E>) t.right(n), (BTNodo<E>) t1.right(n1), t, t1);
-					}
-					else {
-						if (!t.hasRight(n) && !t1.hasRight(n1))
-							esSub = true;
-						else
-							esSub = false;
-					}
-				}
-			}
-		}
-		catch (InvalidPositionException | BoundaryViolationException e) {
-			
-		}
-		return esSub;
-	}
-		
 	@SuppressWarnings("static-access")
 	public static <E> void main(String args []) {
 		try {
@@ -235,7 +218,7 @@ public class Metodos {
 			arbol.addLeft(p18, 17);
 			
 			Position<Integer> p50 = arbol.addRight(p37,50);
-			Position<Integer> p98 = arbol.addRight(p78, 98);
+			/*Position<Integer> p98 */arbol.addRight(p78, 98);
 			
 			arbol.addRight(p50, 60);
 	
@@ -258,7 +241,7 @@ public class Metodos {
 			
 			System.out.println();
 			System.out.println();
-			
+			/*
 			System.out.println("¿Existe un camino entre 16 y 18? Se espera true --> " + existeCamino(p16,p18,arbol));
 			System.out.println("¿Existe un camino entre 6 y 98? Se espera false --> " + existeCamino(p6,p98,arbol));
 			System.out.println();
@@ -266,11 +249,28 @@ public class Metodos {
 			System.out.println("¿Existe un camino entre 98 y 6? Se espera false --> " + existeCamino(p98,p6,arbol));
 			System.out.println();
 			System.out.println("¿Existe un camino entre 16 y 16? Se espera true --> " + existeCamino(p16,p16,arbol));
+			*/
+			System.out.println();
+			System.out.println();
+			System.out.println("¿Son los dos árboles iguales? Se espera true: " + equivalentes(raiz,arbol,raiz,arbol));
+			System.out.println("¿Son los dos árboles iguales? Se espera false: " + equivalentes(raiz,arbol,arbolEspejo.root(),arbolEspejo));
+
+			ArbolBinario<Integer> subArbol = new ArbolBinario<Integer>();
+			
+			subArbol.createRoot(16);
+			Position<Integer> raizSub = subArbol.root();
+			
+			Position<Integer> p18S = subArbol.addLeft(raizSub,18);
+			subArbol.addRight(raizSub,6);
+
+			arbol.addRight(p18S,17);
+			System.out.println("¿A es subárbol de A1? Se espera true: " + esSubArbol(subArbol,arbolEspejo));
+			subArbol.addLeft(p18S,43);
+			System.out.println("¿A es subárbol de A1? Se espera false: " + esSubArbol(subArbol,arbolEspejo));
+			System.out.println("¿A es subárbol de A? Se espera true: " + esSubArbol(subArbol,subArbol));
 			
 		} catch(EmptyTreeException | InvalidOperationException | InvalidPositionException e) {
 			e.printStackTrace();
 		}
-		
 	}	
-	
 }

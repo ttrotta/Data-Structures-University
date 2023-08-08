@@ -39,7 +39,7 @@ public class ArbolBinario<E> implements BinaryTree<E> {
 	public Iterable<Position<E>> positions() {
 		PositionList<Position<E>> list = new ListaDoblementeEnlazada<Position<E>>();
 		if(!isEmpty())
-			preOrden((BTNodo<E>)root, list);
+			preOrden(root, list);
 		return list;
 	}
 
@@ -128,7 +128,7 @@ public class ArbolBinario<E> implements BinaryTree<E> {
 		BTPosition<E> nodo = checkPosition(v);
 		if(hasLeft(v))
 			throw new InvalidOperationException("Ya hay un hijo derecho en la posición.");
-		BTPosition<E> toInsert = new BTNodo<E>(r, null, null, (BTNodo<E>) v);
+		BTPosition<E> toInsert = new BTNodo<E>(r, null, null, nodo);
 		nodo.setLeft(toInsert);
 		size++;
 		return toInsert;
@@ -266,14 +266,14 @@ public class ArbolBinario<E> implements BinaryTree<E> {
 		}
 	}
 	
-	private void preOrden(BTNodo<E> v, PositionList<Position<E>> list) {
+	private void preOrden(Position<E> v, PositionList<Position<E>> list) {
 		list.addLast(v);
 		try {
 			if(hasLeft(v))
-				preOrden((BTNodo<E>)v.getLeft(),list);
+				preOrden(left(v),list);
 			if(hasRight(v))
-			    preOrden((BTNodo<E>)v.getRight(),list);
-		} catch (InvalidPositionException e) {
+			    preOrden(right(v),list);
+		} catch (InvalidPositionException | BoundaryViolationException e) {
 			throw new RuntimeException(e);
 		}
 	}

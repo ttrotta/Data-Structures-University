@@ -175,7 +175,6 @@ public class ListaSE<E> implements PositionList<E>{
 		}
 	}
 	
-
 	// -------------  Clase privada Nodo<E> -------------
 	/**
 	 * Clase Nodo anidada, permite evitar modificar la lista mediante casting

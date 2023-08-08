@@ -194,5 +194,4 @@ public class ListaDE<E> implements PositionList<E> {
 		public void setNext(Nodo<E> n) { next = n; }
 	}
 	//--------- Final de la Clase Nodo Anidada ---------
-	
 }

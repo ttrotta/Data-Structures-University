@@ -4,9 +4,11 @@ import java.util.Iterator;
 
 import Exceptions.*;
 import Interfaces.*;
+import TDAMapeo.Map;
 import TDALista.*;
 import TDACola.*;
 import TDAPila.*;
+import TDAMapeo.*;
 
 public class Metodos {
 	// Recorrido post Orden
@@ -394,6 +396,39 @@ public class Metodos {
 		 return nodo;
 	}
 	
+	// Ejercicio de parcial
+	/*
+	 * Escriba un método que dado un árbol A de carácteres retorne un mapeo de caracteres de enteros.
+	 * Las claves del mapeo deben representar los rótulos de los nodos del árbol (puede asumir que
+	 * no hay rótulo repetidos) y el entero de la cantidad de hijos que el nodo en cuestión tiene.
+	 * Debe resolver este problema de forma recursiva. Asuma que cuenta con los TDA Arbol, Lista y Diccionario
+	 * totalmente implementados. Deberá programar los método auxiliares utilizados.
+	 */
+	public static Map<Character,Integer> ejercicioParcial(Tree<Character> A) {
+		Map<Character,Integer> toRet = new MapOpenAdressing<Character,Integer>();
+		try {
+			if(!A.isEmpty())
+				funcionRecursiva(A.root(),toRet, A);
+		} catch(EmptyTreeException e) { e.printStackTrace(); }
+		return toRet;
+	}
+	
+	public static void funcionRecursiva(Position<Character> v, Map<Character,Integer> mapeo, Tree<Character> A) {
+		try {
+			int cont = 0;
+			for(Position<Character> hijo : A.children(v)) {
+				funcionRecursiva(hijo,mapeo,A);
+				cont++;
+			}
+			mapeo.put(v.element(), cont);
+		} catch(InvalidPositionException | InvalidKeyException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// Implemente un método llamado removeSpecial(p) que elimine el cuarto hijo de p siempre y cuando 
+	// exista y sea una hoja. Implementar auxiliares utilizados. Si se usan otro metodos de Arbol tmb implementar.
+
 	public static void main(String args []) {
 		Tree<Integer> arbol = new Arbol<Integer>();
 		try {

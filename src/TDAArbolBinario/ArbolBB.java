@@ -142,9 +142,7 @@ public class ArbolBB<E extends Comparable<E>> {
 		}
 		if(a.getIzq().getRotulo() != null) diferenciaRec(a.getIzq(),B,C);
 		if(a.getDer().getRotulo() != null) diferenciaRec(a.getDer(),B,C);
-
-	}
-	
+	}	
 
 	// Ejercicio 9
 	/* Programe una operación llamada Ejercicio14 que forma parte de la clase árbol binario de

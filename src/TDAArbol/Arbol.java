@@ -43,7 +43,7 @@ public class Arbol<E> implements Tree<E>{
 
 	public E replace(Position<E> v, E e) throws InvalidPositionException {
 		TNodo<E> nodo = checkPosition(v);
-		E toReturn = nodo.element(); // Se llaman element() los de Nodo y Position (considerar cambiar) 
+		E toReturn = nodo.element(); 
 		nodo.setElement(e);
 		return toReturn;
 	}

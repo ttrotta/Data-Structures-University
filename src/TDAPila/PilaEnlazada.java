@@ -21,7 +21,7 @@ public class PilaEnlazada<E> implements Stack<E> {
 	public E pop() throws EmptyStackException{
 		E temp = null;
 		if (isEmpty()) 
-			throw new EmptyStackException("La pila esta vacia");
+			throw new EmptyStackException("La pila esta vacía");
 		temp = head.getElement();
 		head = head.getNext();
 		size--;
